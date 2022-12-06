@@ -42,7 +42,7 @@ function showCache($result)
             </td>
         </tr>
         <?php
-        $sql = "SELECT * FROM fju_ptt.cache_idip WHERE userID='$ID'";
+        $sql = "SELECT * FROM fju_ptt.cache_idip WHERE userID='$ID' ORDER BY times DESC";
         $result = mysqli_query($con, $sql);
         if (!$result) {
             die($con->error);
@@ -53,7 +53,7 @@ function showCache($result)
         } else {
             echo "<script>alert('搜尋中，請稍後');</script>";
             require_once "reSearchIDIP.php";
-            $sql = "SELECT * FROM fju_ptt.cache_idip WHERE userID='$ID'";
+            $sql = "SELECT * FROM fju_ptt.cache_idip WHERE userID='$ID' ORDER BY times DESC";
             $result = mysqli_query($con, $sql);
             if (mysqli_num_rows($result) > 0) {
                 showCache($result);

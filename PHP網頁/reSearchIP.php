@@ -20,7 +20,7 @@ GROUP by `userID` 
 ORDER by COUNT(`idArticles`) desc;
     */
 
-    $sql="SELECT `userID`,COUNT(`idArticles`) as `times`,IP FROM `messages` where `IP` LIKE '$IP' GROUP by `userID`";
+    $sql="SELECT `userID`,COUNT(`idArticles`) as `times`,IP FROM `messages` where `IP` LIKE '$IP' GROUP by `userID`,IP";
     $result = mysqli_query($con, $sql);
     if (!$result) {
         echo "Error: " . $sql . "<br>" . mysqli_error($con);
