@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     String result; // 儲存資料用的字串
     EditText editText;
     static String idSearch ="";
+    Handler handler;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,10 +56,21 @@ public class MainActivity extends AppCompatActivity {
         button = findViewById(R.id.button);
         textView = findViewById(R.id.text_view);
         editText = findViewById(R.id.idSearch);
+        handler=new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                String[] split = result.split(",");
+                ListView listview = (ListView) findViewById(R.id.listview);
+                ArrayAdapter adapter = new ArrayAdapter(MainActivity.this, android.R.layout.simple_list_item_1,split);
+                listview.setAdapter(adapter);
+            }
+        };
+        //ListView 要顯示的內容
+
+        //android.R.layout.simple_list_item_1 為內建樣式，還有其他樣式可自行研究
 
         // 宣告按鈕的監聽器監聽按鈕是否被按下
         // 跟上次在 View 設定的方式並不一樣
-        // 我只是覺得好像應該也教一下這種寫法
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             // 按鈕事件
@@ -109,22 +121,37 @@ public class MainActivity extends AppCompatActivity {
                     // 取得輸入串流
                     BufferedReader bufReader = new BufferedReader(new InputStreamReader(inputStream, "utf-8"), 8);
                     // 讀取輸入串流的資料
-                    String box = ""; // 宣告存放用字串
+                    String box=""; // 宣告存放用字串
                     String line = null; // 宣告讀取用的字串
                         while((line = bufReader.readLine()) != null) {
                             box += line + "\n";
+                            System.out.println(box);
                             // 每當讀取出一列，就加到存放字串後面
                         }
+
                         inputStream.close(); // 關閉輸入串流
                         // 把存放用字串放到全域變數
+
                         //開始解析json
-//                      JSONArray j = new JSONArray(box);\
-                        //
-
-                        JSONObject j = new JSONObject(box);
-                        result =j.getString("str");
-
-
+                        //由於回傳是放在$result[] array字串陣列中，因此要先轉為JSONArray
+                        //但是又由於我要用jetString的方始取得json 的key再顯示出來，因此又要轉成JSONObject，因為key是String
+                        //之後用一個temp字串暫存結果(不用也可以)，因為我是用","在分割字串成array字串的，至於為什麼要分割成array字串
+                        //因為我使用的功能listView是只接受array字串的，他將每個字串分別分行列出來
+                        //box+="box的長度為:"+box.length();
+                //經上面函數檢查box當街收到為搜尋到的json空值傳回時，長度為11不知道為什麼，不過先用此長度做防呆。
+                if(box.length()==11){
+                    box="沒有資料";
+                    result=box;
+                }else {
+                    JSONArray j = new JSONArray(box);
+                    String temp = "";
+                    for (int i = 0; i < j.length(); i++) {
+                        JSONObject jj = j.getJSONObject(i);
+                        temp += jj.getString("name") + ",";
+                    }
+                    result = temp;
+                }
+//                        result=box;
                 //用list的方法轉換JSONArray到String
 //                List<String> list = new ArrayList<String>();
 //                for (int i = 0; i < j.length(); i++) {
@@ -136,7 +163,10 @@ public class MainActivity extends AppCompatActivity {
             // 當這個執行緒完全跑完後執行
             runOnUiThread(new Runnable() {
                 public void run() {
-                    textView.setText(result); // 更改顯示文字
+                    textView.setText(result);
+                    handler.sendEmptyMessage(0);
+
+                    // 更改顯示文字
                 }
             });
         }
