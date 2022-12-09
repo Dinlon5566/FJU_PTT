@@ -24,6 +24,7 @@ function showTable($result)
         }
         $json_array[] = $data;
     }
+	 echo json_encode($json_array, JSON_UNESCAPED_UNICODE);
 }
 
 /*
