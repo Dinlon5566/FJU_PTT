@@ -14,12 +14,23 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
 
 public class SearchFragment extends Fragment {
 
     private Activity activity;
     private EditText et_search;
     private Button bt_searchip,bt_searchaccount;
+    String result;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -59,5 +70,6 @@ public class SearchFragment extends Fragment {
             }
         });
     }
+
 }
 
