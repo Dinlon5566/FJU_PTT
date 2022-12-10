@@ -51,7 +51,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         // 找到視圖的元件並連接
         button = findViewById(R.id.button);
         textView = findViewById(R.id.text_view);
@@ -77,7 +76,6 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 // 按下之後會執行的程式碼
                 // 宣告執行緒
-
                 Thread thread = new Thread(mutiThread);
                 thread.start(); // 開始執行
                 idSearch = String.valueOf(editText.getText());
@@ -94,7 +92,9 @@ public class MainActivity extends AppCompatActivity {
         public void run()
         {
             try {
-                URL url = new URL("http://140.136.151.135/GetData.php");
+
+                String data = "IP="+idSearch;
+                URL url = new URL("http://140.136.151.135/functionPage/json_IP.php");
                 // 開始宣告 HTTP 連線需要的物件，這邊通常都是一綑的
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 // 建立 Google 比較挺的 HttpURLConnection 物件
@@ -105,15 +105,12 @@ public class MainActivity extends AppCompatActivity {
                 connection.setUseCaches(false); // 不使用快取
                 connection.connect();
                  // 開始連線
-
-
-
                     //輸出
-
                     JSONObject json = new JSONObject();
-                    json.put("idkey",idSearch);
+                    json.put("ID",idSearch);
+
                     OutputStream outputStream = connection.getOutputStream();
-                    outputStream.write(json.toString().getBytes());
+                    outputStream.write(data.getBytes());
                     outputStream.flush();
                     outputStream.close();
                     //輸入
@@ -125,10 +122,8 @@ public class MainActivity extends AppCompatActivity {
                     String line = null; // 宣告讀取用的字串
                         while((line = bufReader.readLine()) != null) {
                             box += line + "\n";
-                            System.out.println(box);
                             // 每當讀取出一列，就加到存放字串後面
                         }
-
                         inputStream.close(); // 關閉輸入串流
                         // 把存放用字串放到全域變數
 
@@ -147,11 +142,11 @@ public class MainActivity extends AppCompatActivity {
                     String temp = "";
                     for (int i = 0; i < j.length(); i++) {
                         JSONObject jj = j.getJSONObject(i);
-                        temp += jj.getString("name") + ",";
+                        temp += jj.getString("userID") + ",";
                     }
                     result = temp;
                 }
-//                        result=box;
+                        //result=box;
                 //用list的方法轉換JSONArray到String
 //                List<String> list = new ArrayList<String>();
 //                for (int i = 0; i < j.length(); i++) {
@@ -165,7 +160,6 @@ public class MainActivity extends AppCompatActivity {
                 public void run() {
                     textView.setText(result);
                     handler.sendEmptyMessage(0);
-
                     // 更改顯示文字
                 }
             });
