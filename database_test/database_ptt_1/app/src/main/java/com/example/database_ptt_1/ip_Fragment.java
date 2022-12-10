@@ -3,10 +3,10 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -17,7 +17,6 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -31,8 +30,6 @@ public class ip_Fragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
     }
 
     @Override
@@ -41,7 +38,7 @@ public class ip_Fragment extends Fragment {
         return inflater.inflate(R.layout.fragment_ip_, container, false);
 
     }
-    private Runnable mutiThread = new Runnable(){
+    //private Runnable runnable= new Runnable(){
         public void run()
         {
             try {
@@ -88,8 +85,8 @@ public class ip_Fragment extends Fragment {
                 //box+="box的長度為:"+box.length();
                 //經上面函數檢查box當街收到為搜尋到的json空值傳回時，長度為11不知道為什麼，不過先用此長度做防呆。
                 if(box.length()==11){
-                    box="沒有資料";
-                    result=box;
+                    box = "沒有資料";
+                    result = box;
                 }else {
                     JSONArray j = new JSONArray(box);
                     String temp = "";
@@ -108,28 +105,24 @@ public class ip_Fragment extends Fragment {
             } catch(Exception e) {
                 result = e.toString(); // 如果出事，回傳錯誤訊息
             }
-            // 當這個執行緒完全跑完後執行
-//            runOnUiThread(new Runnable() {
-//                public void run() {
-                textView.setText(result);
-//                    handler.sendEmptyMessage(0);
-//                    // 更改顯示文字
-//                }
-//            });
+
 
         }
 
-    };
+    //};
+
 
     @Override
     public  void  onViewCreated(@NonNull View view,@NonNull Bundle savedInstanceState){
         super.onViewCreated(view, savedInstanceState);
-        id_listview =view.findViewById(R.id.id_listview);
+        id_listview = view.findViewById(R.id.id_listview);
+        textView = view.findViewById(R.id.textView);
         Bundle bundle = getArguments();
         if(bundle!=null){
             ip = bundle.getString("send");
-            Thread thread = new Thread(mutiThread);
-            thread.start(); // 開始執行
+            run();
+            textView.setText(result);
+
         }
     }
 }
