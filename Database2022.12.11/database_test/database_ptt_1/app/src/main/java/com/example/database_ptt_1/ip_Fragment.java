@@ -8,6 +8,7 @@ import android.os.Bundle;
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.ListFragment;
 import androidx.navigation.fragment.NavHostFragment;
 
 import android.util.Log;
@@ -52,7 +53,6 @@ public class ip_Fragment extends Fragment {
 
     private Runnable mutiThread = new Runnable() {
         public void run() {
-
             try {
                     if(ip.length()<=3){
                         //輸入IP太短
@@ -117,16 +117,17 @@ public class ip_Fragment extends Fragment {
                                 result = "查無結果，請按返回鍵重新搜尋";
                             }
                             else{
-                                IP = "IP:" + jj.getString("IP")  ;
-                                userID = "使用者ID:" + jj.getString("userID");
-                                times = "發文次數:" + jj.getString("times");
+                                IP = "IP:" + jj.getString("IP")+ "\n"  ;
+                                userID = "使用者ID:" + jj.getString("userID")+ "\n";
+                                times = "發文次數:" + jj.getString("times")+ "\n";
                                 resultTolistview[i]=IP + userID + times;
                                 result += IP + userID + times + "\n";
                             }
                         }
                     }
+
                 }
-                //result = resultTolistview[0];
+
                 //用list的方法轉換JSONArray到String
 //                List<String> list = new ArrayList<String>();
 //                for (int i = 0; i < j.length(); i++) {
@@ -137,15 +138,19 @@ public class ip_Fragment extends Fragment {
             }
             getActivity().runOnUiThread(new Runnable() {
                 public void run() {
-                    textView.setText(result);
+                    //textView.setText(result);
                     // 更改顯示文字
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1,resultTolistview);
+                    id_listview.setAdapter(adapter);
                 }
             });
         }
     };
+
     @Override
     public void onViewCreated(@NonNull View view, @NonNull Bundle savedInstanceState) {
         try {
+
             super.onViewCreated(view, savedInstanceState);
             id_listview = view.findViewById(R.id.id_listview);
             textView = view.findViewById(R.id.textView);
@@ -154,11 +159,8 @@ public class ip_Fragment extends Fragment {
                 ip = bundle.getString("send");
                 Thread thread = new Thread(mutiThread);
                 thread.start(); // 開始執行
-                textView.setText(result);
+
                 String[] city ={"new york","taipei","tokyo"};
-                ListView listView = (ListView)view.findViewById(R.id.id_listview);
-                ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1,resultTolistview);
-                listView.setAdapter(adapter);
             }
         }catch (Exception e1){
         }
@@ -182,8 +184,6 @@ public void onAttach(@NonNull Context context) {
             this, // LifecycleOwner
             callback);
 }
-
-
     @Override
     public void onDestroy() {
         result=searchingResult;
