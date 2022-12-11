@@ -141,6 +141,7 @@ public class articleFragment extends Fragment {
             Thread thread = new Thread(mutiThread);
             thread.start(); // 開始執行
             textView2.setText(result);
+
         }
     }
     @Override

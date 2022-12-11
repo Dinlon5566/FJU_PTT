@@ -109,6 +109,7 @@ public class ip_Fragment extends Fragment {
                         String times = "";
                         String error = "";
                         listviewCount = j.length();
+                        resultTolistview= new String[listviewCount];
                         for (int i = 0; i < j.length(); i++) {
                             JSONObject jj = j.getJSONObject(i);
                             error = jj.optString("error");
@@ -116,16 +117,16 @@ public class ip_Fragment extends Fragment {
                                 result = "查無結果，請按返回鍵重新搜尋";
                             }
                             else{
-                                IP = "IP:" + jj.getString("IP") + "\n";
-                                userID = "使用者ID:" + jj.getString("userID") + "\n";
-                                times = "發文次數:" + jj.getString("times") + "\n";
+                                IP = "IP:" + jj.getString("IP")  ;
+                                userID = "使用者ID:" + jj.getString("userID");
+                                times = "發文次數:" + jj.getString("times");
                                 resultTolistview[i]=IP + userID + times;
                                 result += IP + userID + times + "\n";
                             }
                         }
                     }
                 }
-                //result = box;
+                //result = resultTolistview[0];
                 //用list的方法轉換JSONArray到String
 //                List<String> list = new ArrayList<String>();
 //                for (int i = 0; i < j.length(); i++) {
@@ -154,6 +155,10 @@ public class ip_Fragment extends Fragment {
                 Thread thread = new Thread(mutiThread);
                 thread.start(); // 開始執行
                 textView.setText(result);
+                String[] city ={"new york","taipei","tokyo"};
+                ListView listView = (ListView)view.findViewById(R.id.id_listview);
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1,resultTolistview);
+                listView.setAdapter(adapter);
             }
         }catch (Exception e1){
         }
