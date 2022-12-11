@@ -5,10 +5,12 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -23,13 +25,15 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class articleFragment extends Fragment {
+public class articleFragment extends Fragment implements AdapterView.OnItemClickListener{
+
     static String account;
     static String searchingResult="搜尋中...\n由於資料庫龐大請稍後...";
     static String result=searchingResult;
-    private TextView textView2;
+    TextView textView2;
     private ListView id_listview;
     static String[] resultTolistview;
+    static String[] article_id;
     static int listviewCount;
     private Runnable mutiThread= new Runnable(){
         public void run()
@@ -88,6 +92,7 @@ public class articleFragment extends Fragment {
                 String IP = "";
                 listviewCount = j.length();
                 resultTolistview= new String[listviewCount];
+                article_id= new String[listviewCount];
                 for (int i = 0; i < j.length(); i++) {
                     JSONObject jj = j.getJSONObject(i);
                     error = jj.optString("error");
@@ -101,6 +106,7 @@ public class articleFragment extends Fragment {
                         time = "時間:" + jj.getString("time") + "\n";
                         IP = "IP:" + jj.getString("IP") + "\n";
                         resultTolistview[i]=board + idArticles + title + time + IP;
+                        article_id[i]=idArticles;
                         result += board + idArticles + title + time + IP + "\n";
                     }
                 }
@@ -145,7 +151,7 @@ public class articleFragment extends Fragment {
             account = bundle.getString("account");
             Thread thread = new Thread(mutiThread);
             thread.start(); // 開始執行
-            textView2.setText(result);
+            id_listview.setOnItemClickListener(this);
 
         }
     }
@@ -153,5 +159,13 @@ public class articleFragment extends Fragment {
     public void onDestroy() {
         result=searchingResult;
         super.onDestroy();
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+        String send = article_id[i];
+        Bundle bundle = new Bundle();
+        bundle.putString("send",send);
+        Navigation.findNavController(view).navigate(R.id.action_articleFragment_to_article_contentFragment,bundle);
     }
 }

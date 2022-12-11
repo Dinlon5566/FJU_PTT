@@ -5,11 +5,13 @@ import android.os.Bundle;
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -24,7 +26,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 
-public class ip_Fragment extends Fragment {
+public class ip_Fragment extends Fragment implements AdapterView.OnItemClickListener{
+
     static String ip;
     static String searchingResult="搜尋中...\n由於資料庫龐大請稍後...";
     static String result=searchingResult;
@@ -36,6 +39,7 @@ public class ip_Fragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
@@ -113,7 +117,7 @@ public class ip_Fragment extends Fragment {
                                 IP = "IP:" + jj.getString("IP")+ "\n"  ;
                                 userID = "使用者ID:" + jj.getString("userID")+ "\n";
                                 times = "發文次數:" + jj.getString("times");
-                                resultTolistview[i]=IP + userID + times;
+                                resultTolistview[i]=userID;
                                 result += IP + userID + times + "\n";
                             }
                         }
@@ -154,8 +158,7 @@ public class ip_Fragment extends Fragment {
                 ip = bundle.getString("send");
                 Thread thread = new Thread(mutiThread);
                 thread.start(); // 開始執行
-
-                String[] city ={"new york","taipei","tokyo"};
+                id_listview.setOnItemClickListener(this);
             }
         }catch (Exception e1){
         }
@@ -186,4 +189,12 @@ public void onAttach(@NonNull Context context) {
         super.onDestroy();
     }
 
+    @Override
+    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+        String send = resultTolistview[i];
+        Bundle bundle = new Bundle();
+        bundle.putString("send",send);
+        Navigation.findNavController(view).navigate(R.id.action_ip_Fragment_to_accountFragment,bundle);
+
+    }
 }

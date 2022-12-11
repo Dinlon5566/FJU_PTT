@@ -5,10 +5,12 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -24,7 +26,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 
-public class ip_result_Fragment extends Fragment {
+public class ip_result_Fragment extends Fragment implements AdapterView.OnItemClickListener{
 
     static String account;
     static String searchingResult="搜尋中...\n由於資料庫龐大請稍後...";
@@ -105,7 +107,7 @@ public class ip_result_Fragment extends Fragment {
                                 IP = "IP:" + jj.getString("IP") + "\n";
                                 userID = "使用者ID:" + jj.getString("userID") + "\n";
                                 times = "發文次數:" + jj.getString("times") ;
-                                resultTolistview[i]=IP + userID + times;
+                                resultTolistview[i]=IP;
                                 result += IP + userID + times  + "\n";
                             }
                         }
@@ -127,6 +129,7 @@ public class ip_result_Fragment extends Fragment {
                     ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1,resultTolistview);
                     id_listview.setAdapter(adapter);
                     textView4.setText(result);
+
                 }
             });
         }
@@ -155,11 +158,20 @@ public class ip_result_Fragment extends Fragment {
             Thread thread = new Thread(mutiThread);
             thread.start(); // 開始執行
             textView4.setText(result);
+            id_listview.setOnItemClickListener(this);
         }
     }
     @Override
     public void onDestroy() {
         result=searchingResult;
         super.onDestroy();
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+        String send = resultTolistview[i];
+        Bundle bundle = new Bundle();
+        bundle.putString("send",send);
+        Navigation.findNavController(view).navigate(R.id.action_ip_result_Fragment_to_ip_Fragment,bundle);
     }
 }

@@ -5,10 +5,12 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -24,7 +26,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 
-public class near_accountFragment extends Fragment {
+public class near_accountFragment extends Fragment implements AdapterView.OnItemClickListener{
 
     static String account;
     static String searchingResult="搜尋中...\n由於資料庫龐大請稍後...";
@@ -38,6 +40,14 @@ public class near_accountFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
     }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_near_account, container, false);
+    }
+
     private Runnable mutiThread= new Runnable(){
         public void run()
         {
@@ -108,7 +118,7 @@ public class near_accountFragment extends Fragment {
                             W2 = "ID2:"+ jj.getString("w2") + "\n";
                             IP = "IP:" + jj.getString("IP") + "\n";
                             times = "發文次數:" + jj.getString("times") ;
-                            resultTolistview[i]=W1 + W2 + IP + times;
+                            resultTolistview[i]=W2;
                             result += W1 + W2 + IP + times + "\n";
                         }
                     }
@@ -134,12 +144,7 @@ public class near_accountFragment extends Fragment {
             });
         }
     };
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_near_account, container, false);
-    }
+
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -153,6 +158,7 @@ public class near_accountFragment extends Fragment {
             Thread thread = new Thread(mutiThread);
             thread.start(); // 開始執行
             textView3.setText(result);
+            id_listview.setOnItemClickListener(this);
         }
         }catch (Exception e1){
         }
@@ -161,5 +167,13 @@ public class near_accountFragment extends Fragment {
     public void onDestroy() {
         result=searchingResult;
         super.onDestroy();
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+        String send = resultTolistview[i];
+        Bundle bundle = new Bundle();
+        bundle.putString("send",send);
+        Navigation.findNavController(view).navigate(R.id.action_ip_Fragment_to_accountFragment,bundle);
     }
 }

@@ -121,7 +121,7 @@ public class article_contentFragment extends Fragment {
         textView5 = view.findViewById(R.id.textView5);
         Bundle bundle = getArguments();
         if(bundle!=null){
-            account = bundle.getString("account");
+            account = bundle.getString("send");
             Thread thread = new Thread(mutiThread);
             thread.start(); // 開始執行
         }
