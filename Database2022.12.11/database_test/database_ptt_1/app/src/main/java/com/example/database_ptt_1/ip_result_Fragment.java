@@ -25,7 +25,8 @@ import java.net.URL;
 public class ip_result_Fragment extends Fragment {
 
     static String account;
-    static String result;
+    static String searchingResult="搜尋中...\n由於資料庫龐大請稍後...";
+    static String result=searchingResult;
     private TextView textView4;
     private Runnable mutiThread= new Runnable(){
         public void run()
@@ -67,6 +68,7 @@ public class ip_result_Fragment extends Fragment {
                         // 每當讀取出一列，就加到存放字串後面
                     }
                     inputStream.close(); // 關閉輸入串流
+                    connection.disconnect();
                     // 把存放用字串放到全域變數
 
                     //開始解析json
@@ -79,16 +81,24 @@ public class ip_result_Fragment extends Fragment {
                     if(box.length()==24) {
                         result = "查無結果，請按返回鍵重新搜尋";
                     }else {
+                        result = "";
                         JSONArray j = new JSONArray(box);
                         String IP = "";
                         String userID = "";
                         String times = "";
+                        String error = "";
                         for (int i = 0; i < j.length(); i++) {
                             JSONObject jj = j.getJSONObject(i);
-                            IP = "IP:" + jj.getString("IP") + "\n";
-                            userID = "使用者ID:" + jj.getString("userID") + "\n";
-                            times = "發文次數:" + jj.getString("times") + "\n";
-                            result +="\n"+IP + userID + times + "box的長度為:" + box.length();
+                            error = jj.optString("error");
+                            if(error!="") {
+                                result = "查無結果，請按返回鍵重新搜尋";
+                            }
+                            else{
+                                IP = "IP:" + jj.getString("IP") + "\n";
+                                userID = "使用者ID:" + jj.getString("userID") + "\n";
+                                times = "發文次數:" + jj.getString("times") + "\n";
+                                result += IP + userID + times  + "\n";
+                            }
                         }
 
                     }
@@ -131,6 +141,12 @@ public class ip_result_Fragment extends Fragment {
             account = bundle.getString("account");
             Thread thread = new Thread(mutiThread);
             thread.start(); // 開始執行
+            textView4.setText(result);
         }
+    }
+    @Override
+    public void onDestroy() {
+        result=searchingResult;
+        super.onDestroy();
     }
 }

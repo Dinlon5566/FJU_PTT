@@ -97,12 +97,19 @@ public class ip_Fragment extends Fragment {
                         String IP = "";
                         String userID = "";
                         String times = "";
+                        String error = "";
                         for (int i = 0; i < j.length(); i++) {
                             JSONObject jj = j.getJSONObject(i);
-                            IP = "IP:" + jj.getString("IP") + "\n";
-                            userID = "使用者ID:" + jj.getString("userID") + "\n";
-                            times = "發文次數:" + jj.getString("times") + "\n";
-                            result +="\n"+IP + userID + times + "box的長度為:" + box.length();
+                            error = jj.optString("error");
+                            if(error!="") {
+                                result = "查無結果，請按返回鍵重新搜尋";
+                            }
+                            else{
+                                IP = "IP:" + jj.getString("IP") + "\n";
+                                userID = "使用者ID:" + jj.getString("userID") + "\n";
+                                times = "發文次數:" + jj.getString("times") + "\n";
+                                result += IP + userID + times + "\n";
+                            }
                         }
                     }
                 }

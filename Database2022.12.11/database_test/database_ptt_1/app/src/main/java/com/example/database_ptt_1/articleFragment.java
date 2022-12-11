@@ -23,13 +23,16 @@ import java.net.URL;
 
 public class articleFragment extends Fragment {
     static String account;
-    static String result;
+    static String searchingResult="搜尋中...\n由於資料庫龐大請稍後...";
+    static String result=searchingResult;
     private TextView textView2;
 
     private Runnable mutiThread= new Runnable(){
         public void run()
         {
-            try {
+            try {if(account.length()>50) {
+                result = "輸入過長，格式錯誤";
+                }else{
                 String data = "ID="+account;
                 URL url = new URL("http://140.136.151.135/functionPage/json_articleLog.php");
                 // 開始宣告 HTTP 連線需要的物件，這邊通常都是一綑的
@@ -63,6 +66,7 @@ public class articleFragment extends Fragment {
                     // 每當讀取出一列，就加到存放字串後面
                 }
                 inputStream.close(); // 關閉輸入串流
+                connection.disconnect();
                 // 把存放用字串放到全域變數
 
                 //開始解析json
@@ -72,25 +76,37 @@ public class articleFragment extends Fragment {
                 //因為我使用的功能listView是只接受array字串的，他將每個字串分別分行列出來
                 //box+="box的長度為:"+box.length();
                 //經上面函數檢查box當街收到為搜尋到的json空值傳回時，長度為11不知道為什麼，不過先用此長度做防呆。
-//                if(box.length()==11){
-//                    box = "沒有資料";
-//                    result = box;
-//                }else {
-//                    JSONArray j = new JSONArray(box);
-//                    String temp = "";
-//                    for (int i = 0; i < j.length(); i++) {
-//                        JSONObject jj = j.getJSONObject(i);
-//                        temp += jj.getString("userID") + ",";
-//                    }
-//                    result = temp;
-//                }
-                result=box;
+                result = "";
+                JSONArray j = new JSONArray(box);
+                String board = "";
+                String idArticles = "";
+                String title = "";
+                String time = "";
+                String error = "";
+                String IP = "";
+                for (int i = 0; i < j.length(); i++) {
+                    JSONObject jj = j.getJSONObject(i);
+                    error = jj.optString("error");
+                    if(error!="") {
+                        result = "查無結果，請按返回鍵重新搜尋";
+                    }
+                    else{
+                        board = "看板:" + jj.getString("board") + "\n";
+                        idArticles = "代號:" + jj.getString("idArticles") + "\n";
+                        title = "標題:" + jj.getString("title") + "\n";
+                        time = "標題:" + jj.getString("time") + "\n";
+                        IP = "IP:" + jj.getString("IP") + "\n";
+                        result += board + idArticles + title + time + IP + "\n";
+                    }
+                }
+
                 //用list的方法轉換JSONArray到String
 //                List<String> list = new ArrayList<String>();
 //                for (int i = 0; i < j.length(); i++) {
-//                    list.add(j.getJSONObject(i).getString("id"));
-//                }
-            } catch(Exception e) {
+//                    list.add(j.getJSONObject(i).getString("id"));}
+                }
+            }
+            catch(Exception e) {
                 result = e.toString(); // 如果出事，回傳錯誤訊息
             }
             getActivity().runOnUiThread(new Runnable() {
@@ -121,6 +137,12 @@ public class articleFragment extends Fragment {
             account = bundle.getString("account");
             Thread thread = new Thread(mutiThread);
             thread.start(); // 開始執行
+            textView2.setText(result);
         }
+    }
+    @Override
+    public void onDestroy() {
+        result=searchingResult;
+        super.onDestroy();
     }
 }
