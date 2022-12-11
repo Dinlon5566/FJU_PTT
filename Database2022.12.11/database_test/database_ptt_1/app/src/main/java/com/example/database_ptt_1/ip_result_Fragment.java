@@ -28,6 +28,8 @@ public class ip_result_Fragment extends Fragment {
     static String searchingResult="搜尋中...\n由於資料庫龐大請稍後...";
     static String result=searchingResult;
     private TextView textView4;
+    static String[] resultTolistview;
+    static int listviewCount;
     private Runnable mutiThread= new Runnable(){
         public void run()
         {
@@ -87,6 +89,7 @@ public class ip_result_Fragment extends Fragment {
                         String userID = "";
                         String times = "";
                         String error = "";
+                        listviewCount = j.length();
                         for (int i = 0; i < j.length(); i++) {
                             JSONObject jj = j.getJSONObject(i);
                             error = jj.optString("error");
@@ -97,10 +100,10 @@ public class ip_result_Fragment extends Fragment {
                                 IP = "IP:" + jj.getString("IP") + "\n";
                                 userID = "使用者ID:" + jj.getString("userID") + "\n";
                                 times = "發文次數:" + jj.getString("times") + "\n";
+                                resultTolistview[i]=IP + userID + times;
                                 result += IP + userID + times  + "\n";
                             }
                         }
-
                     }
                 }
                 //用list的方法轉換JSONArray到String

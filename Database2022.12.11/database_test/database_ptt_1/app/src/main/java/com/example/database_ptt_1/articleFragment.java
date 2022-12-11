@@ -26,7 +26,8 @@ public class articleFragment extends Fragment {
     static String searchingResult="搜尋中...\n由於資料庫龐大請稍後...";
     static String result=searchingResult;
     private TextView textView2;
-
+    static String[] resultTolistview;
+    static int listviewCount;
     private Runnable mutiThread= new Runnable(){
         public void run()
         {
@@ -84,6 +85,7 @@ public class articleFragment extends Fragment {
                 String time = "";
                 String error = "";
                 String IP = "";
+                listviewCount = j.length();
                 for (int i = 0; i < j.length(); i++) {
                     JSONObject jj = j.getJSONObject(i);
                     error = jj.optString("error");
@@ -96,6 +98,7 @@ public class articleFragment extends Fragment {
                         title = "標題:" + jj.getString("title") + "\n";
                         time = "標題:" + jj.getString("time") + "\n";
                         IP = "IP:" + jj.getString("IP") + "\n";
+                        resultTolistview[i]=board + idArticles + title + time + IP;
                         result += board + idArticles + title + time + IP + "\n";
                     }
                 }

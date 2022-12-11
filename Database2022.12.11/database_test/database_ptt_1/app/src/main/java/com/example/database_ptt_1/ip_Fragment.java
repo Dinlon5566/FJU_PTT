@@ -1,10 +1,17 @@
 package com.example.database_ptt_1;
+import static android.content.ContentValues.TAG;
+
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
 
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +37,8 @@ public class ip_Fragment extends Fragment {
     static String result=searchingResult;
     TextView textView;
     private ListView id_listview;
+    static String[] resultTolistview;
+    static int listviewCount;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,6 +52,7 @@ public class ip_Fragment extends Fragment {
 
     private Runnable mutiThread = new Runnable() {
         public void run() {
+
             try {
                     if(ip.length()<=3){
                         //輸入IP太短
@@ -98,6 +108,7 @@ public class ip_Fragment extends Fragment {
                         String userID = "";
                         String times = "";
                         String error = "";
+                        listviewCount = j.length();
                         for (int i = 0; i < j.length(); i++) {
                             JSONObject jj = j.getJSONObject(i);
                             error = jj.optString("error");
@@ -108,6 +119,7 @@ public class ip_Fragment extends Fragment {
                                 IP = "IP:" + jj.getString("IP") + "\n";
                                 userID = "使用者ID:" + jj.getString("userID") + "\n";
                                 times = "發文次數:" + jj.getString("times") + "\n";
+                                resultTolistview[i]=IP + userID + times;
                                 result += IP + userID + times + "\n";
                             }
                         }
@@ -146,9 +158,31 @@ public class ip_Fragment extends Fragment {
         }catch (Exception e1){
         }
     }
+
+@Override
+public void onAttach(@NonNull Context context) {
+    super.onAttach(context);
+    OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+        @Override
+        public void handleOnBackPressed() {
+
+            //按下返回键时想要实现的方法
+            NavHostFragment.findNavController(ip_Fragment.this)
+                    .popBackStack();
+
+        }
+    };
+    //把回调函数添加到Activity中
+    requireActivity().getOnBackPressedDispatcher().addCallback(
+            this, // LifecycleOwner
+            callback);
+}
+
+
     @Override
     public void onDestroy() {
         result=searchingResult;
         super.onDestroy();
     }
+
 }

@@ -28,6 +28,8 @@ public class near_accountFragment extends Fragment {
     static String searchingResult="搜尋中...\n由於資料庫龐大請稍後...";
     static String result=searchingResult;
     private TextView textView3;
+    static String[] resultTolistview;
+    static int listviewCount;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,6 +91,7 @@ public class near_accountFragment extends Fragment {
                     String IP = "";
                     String times = "";
                     String error = "";
+                    listviewCount = j.length();
                     for (int i = 0; i < j.length(); i++) {
                         JSONObject jj = j.getJSONObject(i);
                         error = jj.optString("error");
@@ -100,6 +103,7 @@ public class near_accountFragment extends Fragment {
                             W2 = "ID2:"+ jj.getString("w2") + "\n";
                             IP = "IP:" + jj.getString("IP") + "\n";
                             times = "發文次數:" + jj.getString("times") + "\n";
+                            resultTolistview[i]=W1 + W2 + IP + times;
                             result += W1 + W2 + IP + times + "\n";
                         }
                     }
@@ -119,9 +123,7 @@ public class near_accountFragment extends Fragment {
                     // 更改顯示文字
                 }
             });
-
         }
-
     };
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

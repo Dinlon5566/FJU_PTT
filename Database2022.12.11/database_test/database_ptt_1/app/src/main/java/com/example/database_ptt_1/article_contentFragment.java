@@ -26,6 +26,7 @@ public class article_contentFragment extends Fragment {
     static String account;
     static String result;
     private TextView textView5;
+    static int listviewCount;
     private Runnable mutiThread= new Runnable(){
         public void run()
         {
