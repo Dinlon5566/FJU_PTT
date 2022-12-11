@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">database_ptt_1</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="search_text">請輸入要查詢之 ip/帳號</string>
+    <string name="查IP">查IP</string>
+    <string name="查帳號">查帳號</string>
+    <string name="所有文章" />
+    <string name="article">所有文章</string>
+    <string name="messege">所有留言</string>
+    <string name="ip">使用過IP</string>
+    <string name="search_ip">Search IP</string>
+    <string name="nono">Search_Account</string>
+    <string name="search_account">Search_Account</string>
+</resources>
