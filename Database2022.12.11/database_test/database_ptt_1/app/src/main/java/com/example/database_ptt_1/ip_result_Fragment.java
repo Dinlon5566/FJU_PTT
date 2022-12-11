@@ -97,7 +97,7 @@ public class ip_result_Fragment extends Fragment {
                                 IP = "IP:" + jj.getString("IP") + "\n";
                                 userID = "使用者ID:" + jj.getString("userID") + "\n";
                                 times = "發文次數:" + jj.getString("times") + "\n";
-                                result += IP + userID + times + "box的長度為:" + "\n";
+                                result += IP + userID + times  + "\n";
                             }
                         }
 
