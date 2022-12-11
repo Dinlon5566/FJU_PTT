@@ -1,18 +1,12 @@
 package com.example.database_ptt_1;
-import static android.content.ContentValues.TAG;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
-
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.ListFragment;
 import androidx.navigation.fragment.NavHostFragment;
-
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,10 +14,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
-
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -102,7 +94,7 @@ public class ip_Fragment extends Fragment {
                     if(box.length()==24) {
                         result = "查無結果，請按返回鍵重新搜尋";
                     }else {
-                        result = "";
+                        result ="";
                         JSONArray j = new JSONArray(box);
                         String IP = "";
                         String userID = "";
@@ -114,18 +106,19 @@ public class ip_Fragment extends Fragment {
                             JSONObject jj = j.getJSONObject(i);
                             error = jj.optString("error");
                             if(error!="") {
+                                textView.setVisibility(View.VISIBLE);
                                 result = "查無結果，請按返回鍵重新搜尋";
                             }
                             else{
                                 IP = "IP:" + jj.getString("IP")+ "\n"  ;
                                 userID = "使用者ID:" + jj.getString("userID")+ "\n";
-                                times = "發文次數:" + jj.getString("times")+ "\n";
+                                times = "發文次數:" + jj.getString("times");
                                 resultTolistview[i]=IP + userID + times;
                                 result += IP + userID + times + "\n";
                             }
                         }
                     }
-
+                        //result= box;
                 }
 
                 //用list的方法轉換JSONArray到String
@@ -138,7 +131,9 @@ public class ip_Fragment extends Fragment {
             }
             getActivity().runOnUiThread(new Runnable() {
                 public void run() {
-                    //textView.setText(result);
+                    textView.setText(result);
+                    textView.setVisibility(View.INVISIBLE);
+                    //搜尋到了就隱藏文字
                     // 更改顯示文字
                     ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1,resultTolistview);
                     id_listview.setAdapter(adapter);
@@ -187,6 +182,7 @@ public void onAttach(@NonNull Context context) {
     @Override
     public void onDestroy() {
         result=searchingResult;
+        id_listview.setVisibility(View.INVISIBLE);
         super.onDestroy();
     }
 

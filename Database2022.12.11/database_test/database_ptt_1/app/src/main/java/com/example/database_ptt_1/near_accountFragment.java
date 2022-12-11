@@ -9,6 +9,8 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import org.json.JSONArray;
@@ -28,6 +30,7 @@ public class near_accountFragment extends Fragment {
     static String searchingResult="搜尋中...\n由於資料庫龐大請稍後...";
     static String result=searchingResult;
     private TextView textView3;
+    private ListView id_listview;
     static String[] resultTolistview;
     static int listviewCount;
     @Override
@@ -43,6 +46,7 @@ public class near_accountFragment extends Fragment {
                     result = "輸入過長，格式錯誤";
                 }else {
                     String data = "ID=" + account;
+                    resultTolistview= new String[listviewCount];
                     URL url = new URL("http://140.136.151.135/functionPage/json_multi.php");
                     // 開始宣告 HTTP 連線需要的物件，這邊通常都是一綑的
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -92,6 +96,7 @@ public class near_accountFragment extends Fragment {
                     String times = "";
                     String error = "";
                     listviewCount = j.length();
+                    resultTolistview= new String[listviewCount];
                     for (int i = 0; i < j.length(); i++) {
                         JSONObject jj = j.getJSONObject(i);
                         error = jj.optString("error");
@@ -102,7 +107,7 @@ public class near_accountFragment extends Fragment {
                             W1 = "ID1:"+ jj.getString("w1") + "\n";
                             W2 = "ID2:"+ jj.getString("w2") + "\n";
                             IP = "IP:" + jj.getString("IP") + "\n";
-                            times = "發文次數:" + jj.getString("times") + "\n";
+                            times = "發文次數:" + jj.getString("times") ;
                             resultTolistview[i]=W1 + W2 + IP + times;
                             result += W1 + W2 + IP + times + "\n";
                         }
@@ -120,7 +125,11 @@ public class near_accountFragment extends Fragment {
             getActivity().runOnUiThread(new Runnable() {
                 public void run() {
                     textView3.setText(result);
-                    // 更改顯示文字
+                    textView3.setVisibility(View.INVISIBLE);
+                    // 隱藏文字
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1,resultTolistview);
+                    id_listview.setAdapter(adapter);
+                    textView3.setText(result);
                 }
             });
         }
@@ -137,6 +146,7 @@ public class near_accountFragment extends Fragment {
         try {
         super.onViewCreated(view, savedInstanceState);
         textView3 = view.findViewById(R.id.textView3);
+        id_listview = view.findViewById(R.id.id_listview);
         Bundle bundle = getArguments();
         if(bundle!=null){
             account = bundle.getString("account");

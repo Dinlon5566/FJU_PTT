@@ -9,6 +9,8 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import org.json.JSONArray;
@@ -26,6 +28,7 @@ public class articleFragment extends Fragment {
     static String searchingResult="搜尋中...\n由於資料庫龐大請稍後...";
     static String result=searchingResult;
     private TextView textView2;
+    private ListView id_listview;
     static String[] resultTolistview;
     static int listviewCount;
     private Runnable mutiThread= new Runnable(){
@@ -47,10 +50,8 @@ public class articleFragment extends Fragment {
                 connection.connect();
                 // 開始連線
                 //輸出
-
                 JSONObject json = new JSONObject();
                 json.put("ID",account);
-
                 OutputStream outputStream = connection.getOutputStream();
                 outputStream.write(data.getBytes());
                 outputStream.flush();
@@ -86,6 +87,7 @@ public class articleFragment extends Fragment {
                 String error = "";
                 String IP = "";
                 listviewCount = j.length();
+                resultTolistview= new String[listviewCount];
                 for (int i = 0; i < j.length(); i++) {
                     JSONObject jj = j.getJSONObject(i);
                     error = jj.optString("error");
@@ -96,13 +98,12 @@ public class articleFragment extends Fragment {
                         board = "看板:" + jj.getString("board") + "\n";
                         idArticles = "代號:" + jj.getString("idArticles") + "\n";
                         title = "標題:" + jj.getString("title") + "\n";
-                        time = "標題:" + jj.getString("time") + "\n";
+                        time = "時間:" + jj.getString("time") + "\n";
                         IP = "IP:" + jj.getString("IP") + "\n";
                         resultTolistview[i]=board + idArticles + title + time + IP;
                         result += board + idArticles + title + time + IP + "\n";
                     }
                 }
-
                 //用list的方法轉換JSONArray到String
 //                List<String> list = new ArrayList<String>();
 //                for (int i = 0; i < j.length(); i++) {
@@ -115,7 +116,10 @@ public class articleFragment extends Fragment {
             getActivity().runOnUiThread(new Runnable() {
                 public void run() {
                     textView2.setText(result);
+                    textView2.setVisibility(View.INVISIBLE);
                     // 更改顯示文字
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1,resultTolistview);
+                    id_listview.setAdapter(adapter);
                 }
             });
         }
@@ -135,6 +139,7 @@ public class articleFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         textView2 = view.findViewById(R.id.textView2);
+        id_listview = view.findViewById(R.id.id_listview);
         Bundle bundle = getArguments();
         if(bundle!=null){
             account = bundle.getString("account");

@@ -9,6 +9,8 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import org.json.JSONArray;
@@ -28,6 +30,7 @@ public class ip_result_Fragment extends Fragment {
     static String searchingResult="搜尋中...\n由於資料庫龐大請稍後...";
     static String result=searchingResult;
     private TextView textView4;
+    private ListView id_listview;
     static String[] resultTolistview;
     static int listviewCount;
     private Runnable mutiThread= new Runnable(){
@@ -90,16 +93,18 @@ public class ip_result_Fragment extends Fragment {
                         String times = "";
                         String error = "";
                         listviewCount = j.length();
+                        resultTolistview= new String[listviewCount];
                         for (int i = 0; i < j.length(); i++) {
                             JSONObject jj = j.getJSONObject(i);
                             error = jj.optString("error");
                             if(error!="") {
+                                textView4.setVisibility(View.VISIBLE);
                                 result = "查無結果，請按返回鍵重新搜尋";
                             }
                             else{
                                 IP = "IP:" + jj.getString("IP") + "\n";
                                 userID = "使用者ID:" + jj.getString("userID") + "\n";
-                                times = "發文次數:" + jj.getString("times") + "\n";
+                                times = "發文次數:" + jj.getString("times") ;
                                 resultTolistview[i]=IP + userID + times;
                                 result += IP + userID + times  + "\n";
                             }
@@ -117,7 +122,11 @@ public class ip_result_Fragment extends Fragment {
             getActivity().runOnUiThread(new Runnable() {
                 public void run() {
                     textView4.setText(result);
-                    // 更改顯示文字
+                    textView4.setVisibility(View.INVISIBLE);
+                    // 隱藏文字
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1,resultTolistview);
+                    id_listview.setAdapter(adapter);
+                    textView4.setText(result);
                 }
             });
         }
@@ -139,6 +148,7 @@ public class ip_result_Fragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         textView4 = view.findViewById(R.id.textView4);
+        id_listview = view.findViewById(R.id.id_listview);
         Bundle bundle = getArguments();
         if(bundle!=null){
             account = bundle.getString("account");
