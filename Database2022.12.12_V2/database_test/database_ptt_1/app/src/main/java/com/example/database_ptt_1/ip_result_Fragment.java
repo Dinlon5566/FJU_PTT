@@ -1,11 +1,14 @@
 package com.example.database_ptt_1;
 
+import android.content.Context;
 import android.os.Bundle;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +17,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -30,19 +34,23 @@ public class ip_result_Fragment extends Fragment implements AdapterView.OnItemCl
 
     static String account;
     static String searchingResult="搜尋中...\n由於資料庫龐大請稍後...";
-    static String result=searchingResult;
+    public String result=searchingResult;
     private TextView textView4;
+    TextView textmessenge;
     private ListView ip_listview;
     static String[] resultTolistview;
     static String[] IPss;
     static int listviewCount;
+    boolean WhileSearchError=false;
     private Runnable mutiThread= new Runnable(){
         public void run()
         {
             try {
                 if(account.length()>50) {
                     result = "輸入過長，格式錯誤";
+                    resultTolistview=null;
                 }else {
+                    WhileSearchError=true;
                     String data = "ID=" + account;
                     URL url = new URL("http://140.136.151.135/functionPage/json_IDIP.php");
                     // 開始宣告 HTTP 連線需要的物件，這邊通常都是一綑的
@@ -86,59 +94,87 @@ public class ip_result_Fragment extends Fragment implements AdapterView.OnItemCl
                     //因為我使用的功能listView是只接受array字串的，他將每個字串分別分行列出來
                     //box+="box的長度為:"+box.length();
                     //經上面函數檢查box當街收到為搜尋到的json空值傳回時，長度為11不知道為什麼，不過先用此長度做防呆。
-                    if(box.length()==24) {
-                        result = "查無結果，請按返回鍵重新搜尋";
-                    }else {
-                        result = "";
-                        JSONArray j = new JSONArray(box);
-                        String IP = "";
-                        String IPs ="";
-                        String userID = "";
-                        String times = "";
-                        String error = "";
-                        listviewCount = j.length();
-                        resultTolistview= new String[listviewCount];
-                        IPss = new String[listviewCount];
-                        for (int i = 0; i < j.length(); i++) {
-                            JSONObject jj = j.getJSONObject(i);
-                            error = jj.optString("error");
-                            if(error!="") {
-                                textView4.setVisibility(View.VISIBLE);
-                                result = "查無結果，請按返回鍵重新搜尋";
-                            }
-                            else{
-                                IP = "IP:" + jj.getString("IP") + "\n";
-                                IPs = jj.getString("IP");
-                                userID = "使用者ID:" + jj.getString("userID") + "\n";
-                                times = "發文次數:" + jj.getString("times") ;
-                                resultTolistview[i]=IP;
-                                IPss[i]=IPs;
-                                result += IP + userID + times  + "\n";
-                            }
+
+                    result = "";
+                    JSONArray j = new JSONArray(box);
+                    String IP = "";
+                    String IPs ="";
+                    String userID = "";
+                    String times = "";
+                    String error = "";
+                    listviewCount = j.length();
+                    resultTolistview= new String[listviewCount];
+                    IPss = new String[listviewCount];
+                    for (int i = 0; i < j.length(); i++) {
+                        JSONObject jj = j.getJSONObject(i);
+                        error = jj.optString("error");
+                        if(error!="") {
+                            textView4.setVisibility(View.VISIBLE);
+                            result = "查無結果，請按返回鍵重新搜尋";
+                            resultTolistview=null;
+                        }
+                        else{
+                            IP = "IP:" + jj.getString("IP") + "\n";
+                            IPs = jj.getString("IP");
+                            userID = "使用者ID:" + jj.getString("userID") + "\n";
+                            times = "發文次數:" + jj.getString("times") ;
+                            resultTolistview[i]=IP;
+                            IPss[i]=IPs;
+                            result += IP + userID + times  + "\n";
                         }
                     }
                 }
+
                 //用list的方法轉換JSONArray到String
 //                List<String> list = new ArrayList<String>();
 //                for (int i = 0; i < j.length(); i++) {
 //                    list.add(j.getJSONObject(i).getString("id"));
 //                }
             } catch(Exception e) {
-                result = e.toString(); // 如果出事，回傳錯誤訊息
+                result = "網路連線意外中斷，請檢查網路設置";// 如果出事，回傳錯誤訊息
             }
             getActivity().runOnUiThread(new Runnable() {
                 public void run() {
-                    textView4.setText(result);
-                    textView4.setVisibility(View.INVISIBLE);
-                    // 隱藏文字
-                    ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1,resultTolistview);
-                    ip_listview.setAdapter(adapter);
-                    textView4.setText(result);
+                    if(resultTolistview!=null) {
+                        textView4.setText(result);
+                        textView4.setVisibility(View.INVISIBLE);
+                        textmessenge.setVisibility(View.VISIBLE);
+                        textmessenge.setText("共搜尋到了"+String.valueOf(listviewCount)+"筆資料:");
+                        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, resultTolistview);
+                        ip_listview.setAdapter(adapter);
+                        //搜尋到了就隱藏文字
+                        // 更改顯示文字
+                    }else {
+                        textmessenge.setVisibility(View.INVISIBLE);
+                        textView4.setVisibility(View.VISIBLE);
+                        textView4.setText(result);
+                    }
+                    WhileSearchError=false;
                 }
             });
         }
 
     };
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                //按下返回键时想要实现的方法
+                if(WhileSearchError==false){
+                    NavHostFragment.findNavController(ip_result_Fragment.this)
+                            .popBackStack();}
+                else{
+                    Toast.makeText(getActivity(),"正在搜尋中請勿中斷返回...",Toast.LENGTH_SHORT).show();
+                }
+            }
+        };
+        //把回调函数添加到Activity中
+        requireActivity().getOnBackPressedDispatcher().addCallback(
+                this, // LifecycleOwner
+                callback);
+    }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -156,12 +192,14 @@ public class ip_result_Fragment extends Fragment implements AdapterView.OnItemCl
         super.onViewCreated(view, savedInstanceState);
         textView4 = view.findViewById(R.id.textView4);
         ip_listview = view.findViewById(R.id.ip_listview);
+        textmessenge = view.findViewById(R.id.textmessenge);
         Bundle bundle = getArguments();
+        textmessenge.setVisibility(View.INVISIBLE);
+        textView4.setText(result);//顯示正在搜尋訊息
         if(bundle!=null){
             account = bundle.getString("account");
             Thread thread = new Thread(mutiThread);
             thread.start(); // 開始執行
-            textView4.setText(result);
             ip_listview.setOnItemClickListener(this);
         }
     }

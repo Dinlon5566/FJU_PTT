@@ -15,6 +15,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -30,33 +31,35 @@ public class ip_Fragment extends Fragment implements AdapterView.OnItemClickList
 
     static String ip;
     static String searchingResult="搜尋中...\n由於資料庫龐大請稍後...";
-    static String result=searchingResult;
+    public String result=searchingResult;
     TextView textView;
-    private ListView id_listview;
+    TextView textmessenge;
+    private ListView ip_listview;
     static String[] resultTolistview;
     static String[] IPss;
-    static int listviewCount;
+    int listviewCount = 0;
+    boolean WhileSearchError=false;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_ip_, container, false);
-
     }
-
     private Runnable mutiThread = new Runnable() {
         public void run() {
             try {
                     if(ip.length()<=3){
                         //輸入IP太短
                         result = "IP過短，格式錯誤";
+                        resultTolistview=null;
                     }else if(ip.length()>15) {
                         result = "IP過長，格式錯誤";
+                        resultTolistview=null;
                     }else{
+                        WhileSearchError = true;
                     String data = "IP=" + ip;
                     URL url = new URL("http://140.136.151.135/functionPage/json_IP.php");
                     // 開始宣告 HTTP 連線需要的物件，這邊通常都是一綑的
@@ -86,7 +89,7 @@ public class ip_Fragment extends Fragment implements AdapterView.OnItemClickList
                         // 每當讀取出一列，就加到存放字串後面
                     }
                     inputStream.close(); // 關閉輸入串流
-                        connection.disconnect();
+                         connection.disconnect();
                     // 把存放用字串放到全域變數
                     //開始解析json
                     //由於回傳是放在$result[] array字串陣列中，因此要先轉為JSONArray
@@ -96,9 +99,7 @@ public class ip_Fragment extends Fragment implements AdapterView.OnItemClickList
 //                     box+=box.length();
 //                     result = box;
                     //經上面函數檢查box當街收到為搜尋到的json空值傳回時，長度為11不知道為什麼，不過先用此長度做防呆
-                    if(box.length()==24) {
-                        result = "查無結果，請按返回鍵重新搜尋";
-                    }else {
+
                         result ="";
                         JSONArray j = new JSONArray(box);
                         String IP = "";
@@ -115,6 +116,7 @@ public class ip_Fragment extends Fragment implements AdapterView.OnItemClickList
                             if(error!="") {
                                 textView.setVisibility(View.VISIBLE);
                                 result = "查無結果，請按返回鍵重新搜尋";
+                                resultTolistview=null;
                             }
                             else{
                                 IP = "IP:" + jj.getString("IP")+ "\n"  ;
@@ -128,42 +130,52 @@ public class ip_Fragment extends Fragment implements AdapterView.OnItemClickList
                         }
                     }
                         //result= box;
-                }
-
-                //用list的方法轉換JSONArray到String
+//                用list的方法轉換JSONArray到String
 //                List<String> list = new ArrayList<String>();
 //                for (int i = 0; i < j.length(); i++) {
 //                    list.add(j.getJSONObject(i).getString("id"));
 //                }
             } catch (Exception e) {
-                result = e.toString(); // 如果出事，回傳錯誤訊息
+                result = "網路連線意外中斷，請檢查網路設置"; // 如果出事，回傳錯誤訊息
             }
             getActivity().runOnUiThread(new Runnable() {
                 public void run() {
-                    textView.setText(result);
-                    textView.setVisibility(View.INVISIBLE);
-                    //搜尋到了就隱藏文字
-                    // 更改顯示文字
-                    ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1,resultTolistview);
-                    id_listview.setAdapter(adapter);
+                    if(resultTolistview!=null) {
+                        textView.setText(result);
+                        textView.setVisibility(View.INVISIBLE);
+                        textmessenge.setVisibility(View.VISIBLE);
+                        textmessenge.setText("共搜尋到了"+String.valueOf(listviewCount)+"筆資料:");
+                        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, resultTolistview);
+                        ip_listview.setAdapter(adapter);
+                        //搜尋到了就隱藏文字
+                        // 更改顯示文字
+                    }else {
+                        textmessenge.setVisibility(View.INVISIBLE);
+                        textView.setVisibility(View.VISIBLE);
+                        textView.setText(result);
+                    }
+                    WhileSearchError = false;
                 }
             });
         }
+
     };
 
     @Override
     public void onViewCreated(@NonNull View view, @NonNull Bundle savedInstanceState) {
         try {
-
             super.onViewCreated(view, savedInstanceState);
-            id_listview = view.findViewById(R.id.ip_listview);
+            ip_listview = view.findViewById(R.id.ip_listview);
             textView = view.findViewById(R.id.textView);
+            textmessenge = view.findViewById(R.id.textmessenge);
             Bundle bundle = getArguments();
+            textmessenge.setVisibility(View.INVISIBLE);
+            textView.setText(result);
             if (bundle != null) {
                 ip = bundle.getString("send");
                 Thread thread = new Thread(mutiThread);
                 thread.start(); // 開始執行
-                id_listview.setOnItemClickListener(this);
+                ip_listview.setOnItemClickListener(this);
             }
         }catch (Exception e1){
         }
@@ -175,11 +187,13 @@ public void onAttach(@NonNull Context context) {
     OnBackPressedCallback callback = new OnBackPressedCallback(true) {
         @Override
         public void handleOnBackPressed() {
-
             //按下返回键时想要实现的方法
+            if(WhileSearchError==false){
             NavHostFragment.findNavController(ip_Fragment.this)
-                    .popBackStack();
-
+                    .popBackStack();}
+            else{
+                Toast.makeText(getActivity(),"正在搜尋中請勿中斷返回...",Toast.LENGTH_SHORT).show();
+            }
         }
     };
     //把回调函数添加到Activity中
@@ -190,7 +204,7 @@ public void onAttach(@NonNull Context context) {
     @Override
     public void onDestroy() {
         result=searchingResult;
-        id_listview.setVisibility(View.INVISIBLE);
+        ip_listview.setVisibility(View.INVISIBLE);
         super.onDestroy();
     }
 
@@ -200,6 +214,5 @@ public void onAttach(@NonNull Context context) {
         Bundle bundle = new Bundle();
         bundle.putString("send",send);
         Navigation.findNavController(view).navigate(R.id.action_ip_Fragment_to_accountFragment,bundle);
-
     }
 }
