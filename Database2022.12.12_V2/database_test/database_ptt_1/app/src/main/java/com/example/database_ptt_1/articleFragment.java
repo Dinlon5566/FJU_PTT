@@ -164,7 +164,7 @@ public class articleFragment extends Fragment implements AdapterView.OnItemClick
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         textView2 = view.findViewById(R.id.textView2);
-        id_listview = view.findViewById(R.id.ip_listview);
+        id_listview = view.findViewById(R.id.id_listview);
         textmessenge = view.findViewById(R.id.textmessenge);
         Bundle bundle = getArguments();
         textmessenge.setVisibility(View.INVISIBLE);
