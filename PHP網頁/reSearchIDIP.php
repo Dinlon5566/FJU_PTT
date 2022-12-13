@@ -17,15 +17,37 @@ ORDER BY COUNT(`idArticles`) desc;
 */
 
 $sql="SELECT IP,COUNT(`idArticles`) as 'times' FROM messages WHERE `userID`='$ID' GROUP by IP ;";
+$sql2="SELECT IP,COUNT(`idArticles`) as 'times' FROM articles WHERE `writer`='$ID' GROUP by IP ;";
 $result=mysqli_query($con,$sql);
-if(!$result){
+$result2=mysqli_query($con,$sql2);
+if(!$result||!$result2){
     die($con->error);
 }
 if(mysqli_num_rows($result)>0){
     while($row=mysqli_fetch_assoc($result)){
         $sql="INSERT INTO cache_idip (IP,userID,times) VALUES ('{$row['IP']}','$ID','{$row['times']}');";
-        $result2=mysqli_query($con,$sql);
-        if(!$result2){
+        $resultA=mysqli_query($con,$sql);
+        if(!$resultA){
+           echo $con->error;
+        }
+    }
+}
+if(mysqli_num_rows($result2)>0){
+    while($row=mysqli_fetch_assoc($result2)){
+        //add to cache_idip ;time+=times
+        $sql="SELECT * FROM cache_idip WHERE IP='{$row['IP']}' AND userID='$ID';";
+        $resultA=mysqli_query($con,$sql);
+        if(!$resultA){
+           echo $con->error;
+        }
+        if(mysqli_num_rows($resultA)>0){
+            $sql="UPDATE cache_idip SET times=times+{$row['times']} WHERE IP='{$row['IP']}' AND userID='$ID';";
+        }else{
+            $sql="INSERT INTO cache_idip (IP,userID,times) VALUES ('{$row['IP']}','$ID','{$row['times']}');";
+        }
+
+        $resultB=mysqli_query($con,$sql);
+        if(!$resultB){
            echo $con->error;
         }
     }
