@@ -45,7 +45,7 @@ public class article_contentFragment extends Fragment {
     ProgressBar pgSpinner;//轉圈圈美觀搜尋
     private Runnable mutiThread= new Runnable(){
         public void run()
-        {
+        {       result=searchingResult;
             try {
                 WhileSearchError=true;
                 pgSpinner.setVisibility(View.VISIBLE);//顯示轉圈圈

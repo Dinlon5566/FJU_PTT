@@ -55,7 +55,7 @@ public class ip_Fragment extends Fragment implements AdapterView.OnItemClickList
     }
     private Runnable mutiThread = new Runnable() {
         public void run() {
-            try {
+            try {   result=searchingResult;
                     if(ip.length()<=3){
                         //輸入IP太短
                         result = "IP過短，格式錯誤";

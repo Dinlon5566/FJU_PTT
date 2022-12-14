@@ -58,7 +58,7 @@ public class near_accountFragment extends Fragment implements AdapterView.OnItem
 
     private Runnable mutiThread= new Runnable(){
         public void run()
-        {
+        {           result=searchingResult;
             try {
                 if(account.length()>50) {
                     result = "輸入過長，格式錯誤";

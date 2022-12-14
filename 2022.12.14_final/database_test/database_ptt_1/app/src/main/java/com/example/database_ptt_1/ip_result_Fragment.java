@@ -48,7 +48,7 @@ public class ip_result_Fragment extends Fragment implements AdapterView.OnItemCl
     ProgressBar pgSpinner;//轉圈圈美觀搜尋
     private Runnable mutiThread= new Runnable(){
         public void run()
-        {
+        {           result=searchingResult;
             try {
                 if(account.length()>50) {
                     result = "輸入過長，格式錯誤";
