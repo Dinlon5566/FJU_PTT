@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">database_ptt_1</string>
+    <string name="app_name">第三組-PTT特殊帳號警告與查詢程式</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="search_text">請輸入要查詢之 ip/帳號</string>
