@@ -28,6 +28,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 
 
@@ -58,6 +60,8 @@ public class ip_result_Fragment extends Fragment implements AdapterView.OnItemCl
                     URL url = new URL("http://140.136.151.135/functionPage/json_IDIP.php");
                     // 開始宣告 HTTP 連線需要的物件，這邊通常都是一綑的
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                    connection.setConnectTimeout(30000);
+                    connection.setReadTimeout(30000);//連線超過30秒會顯示無結果，因為實際上若>30秒php會報錯
                     // 建立 Google 比較挺的 HttpURLConnection 物件
                     connection.setRequestMethod("POST");
                     // 設定連線方式為 POST
@@ -133,8 +137,13 @@ public class ip_result_Fragment extends Fragment implements AdapterView.OnItemCl
 //                for (int i = 0; i < j.length(); i++) {
 //                    list.add(j.getJSONObject(i).getString("id"));
 //                }
-            } catch(Exception e) {
-                result = "網路連線意外中斷，請檢查網路設置";// 如果出事，回傳錯誤訊息
+            } catch (SocketTimeoutException t) {
+                // 如果出事，回傳錯誤訊息
+                result = "查無結果，請按返回鍵重新搜尋";
+            }catch (SocketException i){
+                result = "網路連線意外中斷，請檢查網路設置";
+            }catch (Exception e){
+                result = "網路連線意外中斷，請檢查網路設置";
             }
             getActivity().runOnUiThread(new Runnable() {
                 public void run() {
