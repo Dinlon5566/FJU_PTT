@@ -206,7 +206,8 @@ public void onAttach(@NonNull Context context) {
             //按下返回键时想要实现的方法
             if(WhileSearchError==false){
             NavHostFragment.findNavController(ip_Fragment.this)
-                    .popBackStack();}
+                    .popBackStack();
+                result = searchingResult;}
             else{
                 Toast.makeText(getActivity(),"正在搜尋中請勿中斷返回...",Toast.LENGTH_SHORT).show();
             }

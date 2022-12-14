@@ -200,7 +200,8 @@ public class articleFragment extends Fragment implements AdapterView.OnItemClick
                 //按下返回键时想要实现的方法
                 if(WhileSearchError==false){
                     NavHostFragment.findNavController(articleFragment.this)
-                            .popBackStack();}
+                            .popBackStack();
+                    result = searchingResult;}
                 else{
                     Toast.makeText(getActivity(),"正在搜尋中請勿中斷返回...",Toast.LENGTH_SHORT).show();
                 }

@@ -180,7 +180,8 @@ public class near_accountFragment extends Fragment implements AdapterView.OnItem
                 //按下返回键时想要实现的方法
                 if(WhileSearchError==false){
                     NavHostFragment.findNavController(near_accountFragment.this)
-                            .popBackStack();}
+                            .popBackStack();
+                    result = searchingResult;}
                 else{
                     Toast.makeText(getActivity(),"正在搜尋中請勿中斷返回...",Toast.LENGTH_SHORT).show();
                 }

@@ -191,7 +191,8 @@ public class article_contentFragment extends Fragment {
                 //按下返回键时想要实现的方法
                 if(WhileSearchError==false){
                     NavHostFragment.findNavController(article_contentFragment.this)
-                            .popBackStack();}
+                            .popBackStack();
+                    result = searchingResult;}
                 else{
                     Toast.makeText(getActivity(),"正在搜尋中請勿中斷返回...",Toast.LENGTH_SHORT).show();
                 }
