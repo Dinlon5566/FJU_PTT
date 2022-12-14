@@ -125,7 +125,7 @@ public class ip_result_Fragment extends Fragment implements AdapterView.OnItemCl
                             IPs = jj.getString("IP");
                             userID = "使用者ID:" + jj.getString("userID") + "\n";
                             times = "發文次數:" + jj.getString("times") ;
-                            resultTolistview[i]=IP;
+                            resultTolistview[i]=IP+times;
                             IPss[i]=IPs;
                             result = searchingResult;
                         }
