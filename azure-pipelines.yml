@@ -1,0 +1,62 @@
+trigger:
+- main
+
+pool:
+  vmImage: windows-latest
+
+variables:
+  projectToken: ''
+
+jobs:
+  - job: Mend
+    displayName: 'Mend Scan'
+
+    - script: | # Download UA
+        echo Download Unified Agent
+        curl -LJO https://unified-agent.s3.amazonaws.com/wss-unified-agent.jar
+        # https://unified-agent.s3.amazonaws.com/wss-unified-agent-23.6.2.jar
+      displayName: 'Download UA'
+
+    - script: | # Scan WorkSpace
+        echo Start Scan The Job With Unified Agent
+        java -jar wss-unified-agent.jar -d $(Pipeline.Workspace)
+        # java -jar wss-unified-agent.jar -d $(Pipeline.Workspace) -apiKey $(APIKEY) -product $(ProductName) -project $(ProjectName)
+        echo "======================================================ls======================================================"
+        ls
+      displayName: 'Scan WorkSpace'
+      env:
+        WS_APIKEY: $(APIKEY)
+        WS_USERKEY: $(USERKEY)
+        WS_PRODUCTNAME: Ashe_AZDO_$(System.TeamProject)
+        WS_PROJECTNAME: $(Build.Repository.Name)__$(ProjectName)
+        WS_REQUIREKNOWNSHA1: false
+        WS_RESOLVEALLDEPENDENCIES: true
+        WS_FILESYSTEMSCAN: false
+        WS_GENERATEPROJECTDETAILSJSON: true
+        WS_EXCLUDES: '**/build/** **/tests/**'
+
+    - task: PowerShell@2 # Get Project Token
+      inputs:
+        targetType: 'inline'
+        script: |
+          cd whitesource
+          $pjTokenJson = Get-Content -Path scanProjectDetails.json -Raw | ConvertFrom-Json
+          ${projectToken} = $pjTokenJson.projects[0].projectToken
+          echo "Project Token: ${projectToken}"
+          Write-Host "##vso[task.setvariable variable=projectToken]$projectToken"
+
+          ${projectName} = $pjTokenJson.projects[0].projectName
+          echo "Project Name: ${projectName}"
+          Write-Host "##vso[task.setvariable variable=projectName]$projectName"
+
+          cd ..
+
+    - script: | # Download Project Risk Report
+        curl -L -g -X POST "https://saas.whitesourcesoftware.com/api/v1.4" -o $(projectName)_RiskReport.pdf -H "Content-Type: application/json" -d "{\"requestType\":\"getProjectRiskReport\",\"userKey\":\"$(USERKEY)\",\"projectToken\":\"$(projectToken)\"}"
+      displayName: 'Download Risk Report'
+
+    - task: PublishPipelineArtifact@1 # Save Risk Report to Artifact
+      inputs:
+        path: $(System.DefaultWorkingDirectory)/$(projectName)_RiskReport.pdf
+        artifact: 'ReportsArtifact'
+
