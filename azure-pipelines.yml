@@ -2,7 +2,7 @@ trigger:
 - main
 
 pool:
-  vmImage: windows-latest
+  vmImage: ubuntu-latest
 
 variables:
   projectToken: ''
@@ -11,6 +11,8 @@ jobs:
   - job: Mend
     displayName: 'Mend Scan'
 
+    steps:
+    
     - script: | # Download UA
         echo Download Unified Agent
         curl -LJO https://unified-agent.s3.amazonaws.com/wss-unified-agent.jar
@@ -21,7 +23,6 @@ jobs:
         echo Start Scan The Job With Unified Agent
         java -jar wss-unified-agent.jar -d $(Pipeline.Workspace)
         # java -jar wss-unified-agent.jar -d $(Pipeline.Workspace) -apiKey $(APIKEY) -product $(ProductName) -project $(ProjectName)
-        echo "======================================================ls======================================================"
         ls
       displayName: 'Scan WorkSpace'
       env:
